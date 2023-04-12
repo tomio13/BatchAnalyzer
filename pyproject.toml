@@ -1,0 +1,4 @@
+# Batch analyzer package: a small helper system for easy batch processing
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
