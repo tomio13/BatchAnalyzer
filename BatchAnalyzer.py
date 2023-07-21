@@ -353,7 +353,7 @@ def SaveData( header, data, filename, remark='', append= False, report=None):
         Parameters:
         header:     a list of headers: this many columns should be
                     in the text file
-        data:       a list of lists: containing lists of each columns.
+        data:       a list of lists: containing lists of the rows
         filename:   name of output. If 'table' is not included, then
                     it is appended to the filename. Extension is forced
                     to .txt
@@ -371,7 +371,8 @@ def SaveData( header, data, filename, remark='', append= False, report=None):
         fn = "%s.txt" %fn
     #end if
 
-    fp = open(fn, 'wt') if append == False else open(fn,'at')
+    mode = 'wt' if append == False else 'at'
+    fp = open(fn, mode, encoding='UTF-8')
 
     fp.write('#')
     fp.write(remark)
