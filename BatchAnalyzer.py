@@ -379,14 +379,14 @@ def SaveData( header, data, filename, remark='', append= False, report=None):
     fp.write('\n#\n')
 
     # txt = '\t'.join(map(repr,header))
-    txt = '\t'.join([repr(i) for i in header])
+    txt = '\t'.join([str(i) for i in header])
     fp.write('#')
     fp.write(txt)
     fp.write('\n')
 
     for l in data:
         # txt = '\t'.join(map(repr, l))
-        txt = '\t'.join([repr(i) for i in l])
+        txt = '\t'.join([str(i) for i in l])
         fp.write(txt)
         fp.write('\n')
     #end for
