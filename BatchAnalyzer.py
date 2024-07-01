@@ -378,13 +378,15 @@ def SaveData( header, data, filename, remark='', append= False, report=None):
     fp.write(remark)
     fp.write('\n#\n')
 
-    txt = '\t'.join(map(repr,header))
+    # txt = '\t'.join(map(repr,header))
+    txt = '\t'.join([repr(i) for i in header])
     fp.write('#')
     fp.write(txt)
     fp.write('\n')
 
     for l in data:
-        txt = '\t'.join(map(repr, l))
+        # txt = '\t'.join(map(repr, l))
+        txt = '\t'.join([repr(i) for i in l])
         fp.write(txt)
         fp.write('\n')
     #end for
@@ -394,6 +396,7 @@ def SaveData( header, data, filename, remark='', append= False, report=None):
         report.write("Saving data to", fn)
         report.write("Remark:", remark)
 #end SaveData
+
 
 def DumpData(data, filename, report=None):
     """ use pickle to dump a file. If the file exists, it is
@@ -426,6 +429,7 @@ def DumpData(data, filename, report=None):
     if report != None:
         report.write("Data dumped to:", fn)
 #end of DumpData
+
 
 def Plot( x, y, xerr=[], yerr=[],
         fN= 1, fmt="+",
