@@ -74,8 +74,8 @@ class Report:
             self.write(self.header, withtime=True)
 
         self.fp.write("\n\n")
-
     #end open
+
 
     def opened(self):
         if self.fp != None:
@@ -84,11 +84,13 @@ class Report:
             return False
     #end of opened
 
+
     def close(self):
         """ close the file """
         self.fp.write("\n\n")
         self.fp.close()
     #end close
+
 
     def write(self, *args, withtime=False, color= ''):
         """ Dump a list of text into the report file,
@@ -123,6 +125,7 @@ class Report:
     #end of write
 #end class Report
 
+
 def ReadConf(filename,
              default={},
              simplify= False,
@@ -156,10 +159,8 @@ def ReadConf(filename,
     res = dict()
 
     if os.path.isfile(filename):
-        fp = open(filename, 'rt')
-
-        alltxt = fp.readlines()
-        fp.close()
+        with open(filename, 'rt', encryption='UTF-8') as fp:
+            alltxt = fp.readlines()
 
         #now the fun: analyze the text line-by-line
         #each line is one unit
@@ -242,6 +243,7 @@ def ReadConf(filename,
     return res
 #end ReadConf
 
+
 def ReadTable(filename, sep="", cols=[], keys=[], DefaultValue=0.0):
     """ take a filename and import a table from it.
         The routine reads a tabulated text file and returns only
@@ -269,15 +271,16 @@ def ReadTable(filename, sep="", cols=[], keys=[], DefaultValue=0.0):
         in the text file, or you may get some misalignement in the
         tables. Shorter columns are no problem.
     """
+    txtlist = None
+
     if os.path.isfile(filename):
-        fp = open(filename, "rt")
-    else:
-        print( "File not found: %s" %filename)
+        with open(filename, 'rt', encoding='UTF-8') as fp:
+            txtlist = fp.readlines()
+
+    if txtlist is None:
+        print( "Unable to read file:", filename)
         return None
     #end if
-
-    txtlist = fp.readlines()
-    fp.close()
 
     #start the loading/numerical conversion
     res = []
@@ -347,6 +350,7 @@ def ReadTable(filename, sep="", cols=[], keys=[], DefaultValue=0.0):
     return retres
 #end of ReadTable
 
+
 def SaveData( header, data, filename, remark='', append= False, report=None):
     """ Dump a data set (list of lists) to a tabulated text file
 
@@ -359,40 +363,46 @@ def SaveData( header, data, filename, remark='', append= False, report=None):
                     to .txt
 
         remark:     any text to add
-        append:     if True, append to end
+        append:     if True, append to end (do not write header if file exists)
         report:     dump a report using a report object and on screen
     """
 
     fn, ext = os.path.splitext(filename)
 
+    # patch up the file name to be ...-table.txt or ends with txt
     if "table" not in fn:
-        fn = "%s-table.txt" %fn
-    else:
-        fn = "%s.txt" %fn
+        fn = f"{fn}-table.txt"
+    elif not fn.endswith('.txt'):
+        fn = f"{fn}.txt"
     #end if
 
+    # if append, use 'at" if not then overwrite with "wt"
     mode = 'wt' if append == False else 'at'
-    fp = open(fn, mode, encoding='UTF-8')
 
-    fp.write('#')
-    fp.write(remark)
-    fp.write('\n#\n')
+    write_header = (not os.path.isfile(filename)) or (not append)
 
-    # txt = '\t'.join(map(repr,header))
-    txt = '\t'.join([str(i) for i in header])
-    fp.write('#')
-    fp.write(txt)
-    fp.write('\n')
+    with open(fn, mode, encoding= "UTF-8") as fp:
+        if write_header:
+            fp.write('#')
+            fp.write(remark)
+            fp.write('\n#\n')
 
-    for l in data:
-        # txt = '\t'.join(map(repr, l))
-        txt = '\t'.join([str(i) for i in l])
-        fp.write(txt)
-        fp.write('\n')
-    #end for
+            # txt = '\t'.join(map(repr,header))
+            txt = '\t'.join([str(i) for i in header])
+            fp.write('#')
+            fp.write(txt)
+            fp.write('\n')
+        # end writing headers
 
-    fp.close()
-    if report != None:
+        # now add the content
+        for l in data:
+            # txt = '\t'.join(map(repr, l))
+            txt = '\t'.join([str(i) for i in l])
+            fp.write(txt)
+            fp.write('\n')
+        #end for
+
+    if report is not None:
         report.write("Saving data to", fn)
         report.write("Remark:", remark)
 #end SaveData
@@ -412,23 +422,22 @@ def DumpData(data, filename, report=None):
 
     #Cut the extension, and put it back
     fn, ext = os.path.splitext(filename)
-    fn = "%s.dat" %fn
+    fn = f"{fn}.dat"
 
-    #do the dumping:
-    try:
-        fp = open(fn, 'wb')
+    dumped = False
 
-    except IOError:
-        print("Unable to open output file!")
-        return
-
-    else:
+    with open(fn, 'wb') as fp:
         dump(data, fp, 2)
-        fp.close()
+        dumped= True
+    if not dumped:
+        print("Unable to dump data!\n")
 
     if report != None:
-        report.write("Data dumped to:", fn)
-#end of DumpData
+        if dumped:
+            report.write("Data dumped to:", fn)
+        else:
+            report.write('Data dump failed to', fn)
+# end of DumpData
 
 
 def Plot( x, y, xerr=[], yerr=[],

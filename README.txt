@@ -19,3 +19,7 @@ the color= to define text color on the terminal.
 
 The ReadConf now has an option to strip the configuration variables from
 lists to their last values. This is good when no lists are needed.
+
+I have ensured that the SaveData can also append ignoring the header if
+the file exists but writing it if not. And moved as much as possible to use
+the with... statement for file handling.
