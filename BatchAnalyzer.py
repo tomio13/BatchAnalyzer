@@ -159,7 +159,7 @@ def ReadConf(filename,
     res = dict()
 
     if os.path.isfile(filename):
-        with open(filename, 'rt', encryption='UTF-8') as fp:
+        with open(filename, 'rt', encoding='UTF-8') as fp:
             alltxt = fp.readlines()
 
         #now the fun: analyze the text line-by-line
@@ -351,7 +351,7 @@ def ReadTable(filename, sep="", cols=[], keys=[], DefaultValue=0.0):
 #end of ReadTable
 
 
-def SaveData( header, data, filename, remark='', append= False, report=None):
+def SaveData(header, data, filename, remark='', append= False, report=None):
     """ Dump a data set (list of lists) to a tabulated text file
 
         Parameters:
@@ -379,7 +379,7 @@ def SaveData( header, data, filename, remark='', append= False, report=None):
     # if append, use 'at" if not then overwrite with "wt"
     mode = 'wt' if append == False else 'at'
 
-    write_header = (not os.path.isfile(filename)) or (not append)
+    write_header = (not os.path.isfile(fn)) or (not append)
 
     with open(fn, mode, encoding= "UTF-8") as fp:
         if write_header:
